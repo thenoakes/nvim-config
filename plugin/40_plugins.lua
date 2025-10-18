@@ -148,7 +148,7 @@ now_if_args(function()
     automatic_installation = true,
   })
 
-  -- Configure LSP servers using the modern vim.lsp.config API
+  -- Configure LSP servers using the modern approach
   local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
   -- Add additional capabilities
@@ -180,8 +180,26 @@ now_if_args(function()
     vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, bufopts)
   end
 
-  -- Configure LSP servers using the modern API
-  vim.lsp.config.lua_ls({
+  -- Use the modern vim.lsp.enable approach for automatic LSP setup
+  vim.lsp.enable({
+    'lua_ls',      -- Lua
+    'pyright',     -- Python
+    'ts_ls',       -- TypeScript/JavaScript
+    'gopls',       -- Go
+    'rust_analyzer', -- Rust
+    'clangd',      -- C/C++
+    'jsonls',      -- JSON
+    'yamlls',      -- YAML
+    'html',        -- HTML
+    'cssls',       -- CSS
+    'tailwindcss', -- Tailwind CSS
+  })
+
+  -- Configure specific LSP servers with custom settings
+  local lspconfig = require('lspconfig')
+
+  -- Lua LSP with custom settings
+  lspconfig.lua_ls.setup({
     capabilities = capabilities,
     on_attach = on_attach,
     settings = {
@@ -194,8 +212,8 @@ now_if_args(function()
     },
   })
 
-  -- TypeScript/JavaScript LSP with proper JSX support
-  vim.lsp.config.ts_ls({
+  -- TypeScript/JavaScript LSP with enhanced settings
+  lspconfig.ts_ls.setup({
     capabilities = capabilities,
     on_attach = on_attach,
     filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
@@ -226,27 +244,27 @@ now_if_args(function()
   })
 
   -- HTML LSP
-  vim.lsp.config.html({
+  lspconfig.html.setup({
     capabilities = capabilities,
     on_attach = on_attach,
     filetypes = { 'html', 'htmldjango', 'htmlmoustache', 'handlebars' },
   })
 
   -- CSS LSP
-  vim.lsp.config.cssls({
+  lspconfig.cssls.setup({
     capabilities = capabilities,
     on_attach = on_attach,
   })
 
   -- Tailwind CSS LSP
-  vim.lsp.config.tailwindcss({
+  lspconfig.tailwindcss.setup({
     capabilities = capabilities,
     on_attach = on_attach,
     filetypes = { 'html', 'css', 'scss', 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
   })
 
   -- JSON LSP
-  vim.lsp.config.jsonls({
+  lspconfig.jsonls.setup({
     capabilities = capabilities,
     on_attach = on_attach,
     settings = {
@@ -257,31 +275,31 @@ now_if_args(function()
   })
 
   -- Python LSP
-  vim.lsp.config.pyright({
+  lspconfig.pyright.setup({
     capabilities = capabilities,
     on_attach = on_attach,
   })
 
   -- Go LSP
-  vim.lsp.config.gopls({
+  lspconfig.gopls.setup({
     capabilities = capabilities,
     on_attach = on_attach,
   })
 
   -- Rust LSP
-  vim.lsp.config.rust_analyzer({
+  lspconfig.rust_analyzer.setup({
     capabilities = capabilities,
     on_attach = on_attach,
   })
 
   -- C/C++ LSP
-  vim.lsp.config.clangd({
+  lspconfig.clangd.setup({
     capabilities = capabilities,
     on_attach = on_attach,
   })
 
   -- YAML LSP
-  vim.lsp.config.yamlls({
+  lspconfig.yamlls.setup({
     capabilities = capabilities,
     on_attach = on_attach,
   })

@@ -316,6 +316,7 @@ nmap_leader('lT', '<Cmd>lua print("File type:", vim.bo.filetype, "| CWD:", vim.f
 nmap_leader('lC', '<Cmd>lua print("TypeScript config:", vim.fn.system("find . -name tsconfig.json -type f 2>/dev/null | head -5"))<CR>', 'Find tsconfig files')
 nmap_leader('lS', '<Cmd>lua local clients = vim.lsp.get_clients(); for _, client in ipairs(clients) do if client.name == "ts_ls" then print("TypeScript LSP settings:", vim.inspect(client.config.settings or {})) break end end<CR>', 'Debug TypeScript settings')
 nmap_leader('lR', '<Cmd>lua local clients = vim.lsp.get_clients(); for _, client in ipairs(clients) do if client.name == "ts_ls" then print("TypeScript LSP root dir:", client.config.root_dir or "Not set") break end end<CR>', 'Debug TypeScript root directory')
+nmap_leader('lP', '<Cmd>lua local bufname = vim.api.nvim_buf_get_name(0); local root_dir = vim.fs.dirname(vim.fs.find({"tsconfig.json", "package.json", ".git"}, {path = bufname, upward = true})[1] or bufname); print("File:", bufname); print("Detected root:", root_dir); print("CWD:", vim.fn.getcwd())<CR>', 'Debug project root detection')
 
 -- Visual mode LSP
 xmap_leader('lf', formatting_cmd, 'Format selection')

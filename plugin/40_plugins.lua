@@ -180,15 +180,58 @@ now_if_args(function()
     vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, bufopts)
   end
 
+  -- Use the modern vim.lsp.enable approach for automatic LSP setup
+  vim.lsp.enable({
+    'lua_ls',      -- Lua
+    'pyright',     -- Python
+    'ts_ls',       -- TypeScript/JavaScript
+    'gopls',       -- Go
+    'rust_analyzer', -- Rust
+    'clangd',      -- C/C++
+    'jsonls',      -- JSON
+    'yamlls',      -- YAML
+    'html',        -- HTML
+    'cssls',       -- CSS
+    'tailwindcss', -- Tailwind CSS
+  })
+
   -- Configure TypeScript LSP with proper root directory detection
-  local lspconfig = require('lspconfig')
-  
-  -- Configure ts_ls with proper root directory detection
-  lspconfig.ts_ls.setup({
-    root_dir = function(fname)
-      return lspconfig.util.root_pattern('tsconfig.json', 'package.json', '.git')(fname) or vim.fn.getcwd()
+  -- This ensures it finds the nearest tsconfig.json instead of looking from the wrong directory
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
+    callback = function()
+      local clients = vim.lsp.get_clients({ name = 'ts_ls' })
+      if #clients > 0 then
+        local client = clients[1]
+        local bufname = vim.api.nvim_buf_get_name(0)
+        local root_dir = vim.fs.dirname(vim.fs.find({ 'tsconfig.json', 'package.json', '.git' }, { path = bufname, upward = true })[1] or bufname)
+        
+        if root_dir and root_dir ~= client.config.root_dir then
+          -- Restart the client with the correct root directory
+          vim.lsp.stop_client(client.id)
+          vim.lsp.start({
+            name = 'ts_ls',
+            root_dir = root_dir,
+            settings = {
+              typescript = {
+                preferences = {
+                  includePackageJsonAutoImports = 'on',
+                },
+              },
+            },
+          })
+        end
+      end
     end,
-    on_attach = function(client, bufnr)
+  })
+
+  -- Set up LSP keymaps when LSP attaches
+  vim.api.nvim_create_autocmd('LspAttach', {
+    group = augroup,
+    callback = function(args)
+      local client = vim.lsp.get_client_by_id(args.data.client_id)
+      local bufnr = args.buf
+      
       -- Enable completion triggered by <c-x><c-o>
       vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
       
@@ -209,27 +252,6 @@ now_if_args(function()
       vim.keymap.set('n', ']d', vim.diagnostic.goto_next, bufopts)
       vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, bufopts)
     end,
-    settings = {
-      typescript = {
-        preferences = {
-          includePackageJsonAutoImports = 'on',
-        },
-      },
-    },
-  })
-
-  -- Use the modern vim.lsp.enable approach for other LSP servers
-  vim.lsp.enable({
-    'lua_ls',      -- Lua
-    'pyright',     -- Python
-    'gopls',       -- Go
-    'rust_analyzer', -- Rust
-    'clangd',      -- C/C++
-    'jsonls',      -- JSON
-    'yamlls',      -- YAML
-    'html',        -- HTML
-    'cssls',       -- CSS
-    'tailwindcss', -- Tailwind CSS
   })
 
   -- LSP autocommands for better diagnostics and formatting

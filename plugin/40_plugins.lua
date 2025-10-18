@@ -200,28 +200,31 @@ now_if_args(function()
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
     callback = function()
+      local bufname = vim.api.nvim_buf_get_name(0)
+      if bufname == '' then return end
+      
+      local root_dir = vim.fs.dirname(vim.fs.find({ 'tsconfig.json', 'package.json', '.git' }, { path = bufname, upward = true })[1] or bufname)
+      
+      -- Stop any existing TypeScript LSP clients
       local clients = vim.lsp.get_clients({ name = 'ts_ls' })
-      if #clients > 0 then
-        local client = clients[1]
-        local bufname = vim.api.nvim_buf_get_name(0)
-        local root_dir = vim.fs.dirname(vim.fs.find({ 'tsconfig.json', 'package.json', '.git' }, { path = bufname, upward = true })[1] or bufname)
-        
-        if root_dir and root_dir ~= client.config.root_dir then
-          -- Restart the client with the correct root directory
-          vim.lsp.stop_client(client.id)
-          vim.lsp.start({
-            name = 'ts_ls',
-            root_dir = root_dir,
-            settings = {
-              typescript = {
-                preferences = {
-                  includePackageJsonAutoImports = 'on',
-                },
-              },
-            },
-          })
-        end
+      for _, client in ipairs(clients) do
+        vim.lsp.stop_client(client.id)
       end
+      
+      -- Start TypeScript LSP with the correct root directory
+      vim.lsp.start({
+        name = 'ts_ls',
+        root_dir = root_dir,
+        settings = {
+          typescript = {
+            preferences = {
+              includePackageJsonAutoImports = 'on',
+            },
+          },
+        },
+      })
+      
+      print("TypeScript LSP started with root:", root_dir)
     end,
   })
 

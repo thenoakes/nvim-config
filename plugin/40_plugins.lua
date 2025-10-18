@@ -220,6 +220,31 @@ now_if_args(function()
     },
   })
 
+  -- Also try with the correct server name that Mason installs
+  lspconfig.ts_ls.setup({
+    capabilities = capabilities,
+    on_attach = on_attach,
+    filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+    settings = {
+      typescript = {
+        inlayHints = {
+          enabled = true,
+        },
+        suggest = {
+          completeFunctionCalls = true,
+        },
+      },
+      javascript = {
+        inlayHints = {
+          enabled = true,
+        },
+        suggest = {
+          completeFunctionCalls = true,
+        },
+      },
+    },
+  })
+
   -- HTML LSP
   lspconfig.html.setup({
     capabilities = capabilities,
@@ -324,6 +349,28 @@ now_if_args(function()
       vim.lsp.buf.clear_references()
     end,
   })
+
+  -- Configure diagnostics
+  vim.diagnostic.config({
+    virtual_text = true,
+    signs = true,
+    update_in_insert = false,
+    underline = true,
+    severity_sort = true,
+    float = {
+      border = 'rounded',
+      source = 'always',
+      header = '',
+      prefix = '',
+    },
+  })
+
+  -- Show diagnostics in a floating window
+  vim.fn.sign_define('DiagnosticSignError', { text = 'E', texthl = 'DiagnosticSignError' })
+  vim.fn.sign_define('DiagnosticSignWarn', { text = 'W', texthl = 'DiagnosticSignWarn' })
+  vim.fn.sign_define('DiagnosticSignInfo', { text = 'I', texthl = 'DiagnosticSignInfo' })
+  vim.fn.sign_define('DiagnosticSignHint', { text = 'H', texthl = 'DiagnosticSignHint' })
+
 end)
 
 -- Completion =================================================================

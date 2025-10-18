@@ -1,10 +1,10 @@
 # Neovim Configuration - Minimax with Helix Inspiration
 
-A clean, minimalist Neovim configuration based on the minimax defaults with Helix-inspired keybindings and workflow.
+A clean, minimalist Neovim configuration based on the minimax defaults with Helix-inspired keybindings and Catppuccin frappe colorscheme.
 
 ## Features
 
-- **Clean, minimalist design** with Catppuccin colorscheme
+- **Clean, minimalist design** with Catppuccin frappe colorscheme
 - **Helix-inspired keybindings** for intuitive modal editing
 - **LSP support** with auto-completion and diagnostics
 - **File tree** with MiniFiles
@@ -101,7 +101,7 @@ A clean, minimalist Neovim configuration based on the minimax defaults with Heli
 
 The configuration is modular and easy to customize:
 
-- **Colorscheme**: Edit `plugin/40_plugins.lua` and change the Catppuccin flavor
+- **Colorscheme**: Edit `plugin/40_plugins.lua` and change the Catppuccin flavor (currently set to frappe)
 - **Keybindings**: Modify `plugin/20_keymaps.lua`
 - **Options**: Adjust `plugin/10_options.lua`
 - **Mini modules**: Configure `plugin/30_mini.lua`

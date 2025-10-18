@@ -1,122 +1,169 @@
-<p align="center"> <img src="logo.png" alt="mini.nvim" style="max-width:100%;border:solid 2px"/> </p>
+# Neovim Configuration - Minimax with Helix Inspiration
 
-## Neovim with maximum MINI
+A clean, minimalist Neovim configuration based on the minimax defaults with Helix-inspired keybindings and workflow.
 
-MiniMax is a collection of fully working self-contained Neovim configs. All of the them:
+## Features
 
-- Use mostly MINI to showcase its capabilities.
-- Provide out of the box a stable, polished, and feature rich Neovim experience.
-- Share minimal structure with potential to build upon.
-- Contain extensively commented config files meant to be read.
+- **Clean, minimalist design** with Catppuccin colorscheme
+- **Helix-inspired keybindings** for intuitive modal editing
+- **LSP support** with auto-completion and diagnostics
+- **File tree** with MiniFiles
+- **Fuzzy finder** with MiniPick
+- **Git integration** with MiniGit
+- **Syntax highlighting** with Treesitter
+- **Comment toggling** and auto-pairs
+- **Indent guides** and visual enhancements
+- **Mini plugins** for additional functionality
 
-It can be automatically [set up](#setting-up), which uses the best suited config from [available ones](configs).
+## Installation
 
-See [change log](CHANGELOG.md) for a history of changes.
+1. Make sure you have Neovim 0.9+ installed
+2. Clone or copy this configuration to `~/.config/nvim/`
+3. Start Neovim and let MiniDeps install all plugins automatically
 
-If you find this project useful, please consider leaving a Github star.
+## Key Bindings
 
-### How it looks
+### Navigation
+- `<leader>ff` - Find files
+- `<leader>fg` - Live grep
+- `<leader>fb` - Find buffers
+- `<leader>fh` - Find help
+- `<leader>fr` - Find recent files
+- `<leader>fc` - Find commands
 
-<a href="https://github.com/nvim-mini/assets/blob/main/demo/demo-minimax_1.png?raw=true"> <img alt="During setup" src="https://github.com/nvim-mini/assets/blob/main/demo/demo-minimax_1.png?raw=true" style="width: 45%"/> </a>
-<a href="https://github.com/nvim-mini/assets/blob/main/demo/demo-minimax_2.png?raw=true"> <img alt="Picker" src="https://github.com/nvim-mini/assets/blob/main/demo/demo-minimax_2.png?raw=true" style="width: 45%"/> </a>
+### File Tree
+- `<leader>ed` - Open file explorer
+- `<leader>ef` - Open directory of current file
 
-<a href="https://github.com/nvim-mini/assets/blob/main/demo/demo-minimax_3.png?raw=true"> <img alt="Clues" src="https://github.com/nvim-mini/assets/blob/main/demo/demo-minimax_3.png?raw=true" style="width: 45%"/> </a>
-<a href="https://github.com/nvim-mini/assets/blob/main/demo/demo-minimax_4.png?raw=true"> <img alt="File explorer" src="https://github.com/nvim-mini/assets/blob/main/demo/demo-minimax_4.png?raw=true" style="width: 45%"/> </a>
+### Window Management
+- `<C-h/j/k/l>` - Navigate between windows
+- `<C-Up/Down/Left/Right>` - Resize windows
 
-### What it is not
+### Buffer Management
+- `<S-h/l>` - Previous/next buffer
+- `<leader>bd` - Delete buffer
+- `<leader>bw` - Wipeout buffer
 
-It is not a "Neovim distribution", i.e. there are no automatic config updates. After your config is set up, it is yours to improve and update (which makes this approach more stable). You can still see how MiniMax itself gets updated (see [Updating](#updating) and [Change log](CHANGELOG.md)) and adjust the config accordingly.
+### Selection (Helix-inspired)
+- `<leader>ea` - Select all
+- `<leader>ew` - Select current word
+- `<leader>el` - Select current line
+- `<leader>ee` - Select to end of line
+- `<leader>eb` - Select to beginning of line
+- `<leader>ei/I` - Select inside/around parentheses
+- `<leader>e[/]` - Select inside/around brackets
+- `<leader>e{/}` - Select inside/around braces
+- `<leader>e'/"` - Select inside/around quotes
 
-It is not a comprehensive guide on how to set up and use every Neovim feature and plugin. Most of the config parts are carefully chosen in order to reach a balance between stability and features.
+### Editing
+- `<leader>ed` - Duplicate line
+- `<leader>eD` - Delete line
+- `<leader>ej` - Join lines
+- `<leader>es` - Split line
+- `<leader>ec` - Toggle comment
+- `<leader>er` - Find and replace
+- `<leader>ey` - Yank to system clipboard
+- `<leader>ep` - Paste from system clipboard
 
-### Requirements
+### LSP
+- `<leader>ld` - Show diagnostic popup
+- `<leader>la` - Code actions
+- `<leader>lr` - Rename
+- `<leader>ls` - Go to definition
+- `<leader>lR` - References
+- `<leader>lf` - Format
 
-#### Software
+### Git
+- `<leader>gs` - Show Git info at cursor
+- `<leader>gd` - Show diff
+- `<leader>gl` - Show log
+- `<leader>go` - Toggle diff overlay
 
-- [Neovim](https://neovim.io/) executable. Assumed to be named `nvim`.
-- [Git](https://git-scm.com/) executable. Assumed to be named `git`.
-- Operating system: any OS supported by Neovim.
-- Internet connection for downloading plugins.
-- (Optional, but recommended) [`ripgrep`](https://github.com/BurntSushi/ripgrep#installation).
-- (Optional, but recommended) Terminal emulator (or GUI) with [true colors](https://github.com/termstandard/colors#truecolor-support-in-output-devices) and [Nerd Font icons](https://www.nerdfonts.com/) support. No need for a full Nerd font, using [`NerdFontsSymbolsOnly`](https://github.com/ryanoasis/nerd-fonts/releases/latest) as a fallback is usually enough.
+## Configuration Structure
 
-#### Knowledge
-
-Basic level of understanding of how to:
-
-- Use CLI (command line): open, navigate file system, execute commands, close.
-
-- Use Neovim: open, modal editing, reading help, close. If inside Neovim, type [`:h help.txt`](https://neovim.io/doc/user/helptag.html?tag=help.txt) (or click it if it is a link) followed by `<Enter>` and it should guide you through understanding basics.
-
-    Several personal recommendations (no need to read in full; be aware of their content): [`:h notation`](https://neovim.io/doc/user/helptag.html?tag=notation), [`:h key-notation`](https://neovim.io/doc/user/helptag.html?tag=key-notation), [`:h vim-modes`](https://neovim.io/doc/user/helptag.html?tag=vim-modes), [`:h mode-switching`](https://neovim.io/doc/user/helptag.html?tag=mode-switching), [`:h windows-intro`](https://neovim.io/doc/user/helptag.html?tag=windows-intro),  [`:h vimtutor`](https://neovim.io/doc/user/helptag.html?tag=vimtutor)
-
-- Read help files from inside Neovim: notion of help tags, key notations, navigation.
-
-  > [!TIP]
-  > If already inside MiniMax config, press `<Space>` + `f` + `h` to fuzzy search across all help tags.
-
-- Read [Lua language](https://learnxinyminutes.com/lua/): variables, tables, function calls, iterations. See also [`:h lua-concepts`](https://neovim.io/doc/user/helptag.html?tag=lua-concepts) and [`:h lua-guide`](https://neovim.io/doc/user/helptag.html?tag=lua-guide).
-
-#### Motivation
-
-- It will be really helpful if you are mentally ready to read documentation and practice. If you are new to Neovim and/or MINI, it might feel like a lot. It gets easier the more you learn and practice. Without this you likely won't enjoy Neovim and MiniMax as much.
-
-### Setting up
-
-This sets up temporary 'nvim-minimax' config and doesn't affect your regular config. To set up a full time config, remove all instances of `NVIM_APPNAME=nvim-minimax`.
-
-```bash
-# Download
-git clone --filter=blob:none https://github.com/nvim-mini/MiniMax ./MiniMax
-
-# Set up config (copies config files and possibly initiates Git repository)
-NVIM_APPNAME=nvim-minimax nvim -l ./MiniMax/setup.lua
-
-# Start Neovim
-NVIM_APPNAME=nvim-minimax nvim
-
-# Wait for plugins to install (there should be no new notifications)
-
-# Enjoy your new config!
-# Start with reading its files (type `<Space>`+`e`+`i`, without much delay in between)
+```
+~/.config/nvim/
+├── init.lua                 # Main entry point
+├── plugin/                  # Plugin configurations
+│   ├── 10_options.lua      # Neovim options
+│   ├── 20_keymaps.lua      # Key mappings
+│   ├── 30_mini.lua         # MINI configuration
+│   └── 40_plugins.lua      # External plugins
+├── after/                   # Override configurations
+│   ├── ftplugin/           # Filetype-specific settings
+│   ├── lsp/                # LSP configurations
+│   └── snippets/           # Snippet files
+├── snippets/                # Global snippets
+└── README.md               # This file
 ```
 
-Notes:
+## Customization
 
-- MiniMax project can be downloaded manually (like via GitHub UI).
+The configuration is modular and easy to customize:
 
-- With `NVIM_APPNAME=nvim-minimax` config directory is '\~/.config/nvim-minimax' on Unix and '\~/AppData/Local/nvim-minimax' on Windows.
+- **Colorscheme**: Edit `plugin/40_plugins.lua` and change the Catppuccin flavor
+- **Keybindings**: Modify `plugin/20_keymaps.lua`
+- **Options**: Adjust `plugin/10_options.lua`
+- **Mini modules**: Configure `plugin/30_mini.lua`
+- **External plugins**: Add to `plugin/40_plugins.lua`
 
-    A full-time config directory is '\~/.config/nvim' on Unix and '\~/AppData/Local/nvim' on Windows.
+## LSP Servers
 
-- If there are messages about backed up files during setup, it means the target config directory already contained files that are meant to come from MiniMax. Previous files were moved to `MiniMax-backup` directory. Review/restore them and delete the whole backup directory.
+The following LSP servers are automatically enabled:
+- lua_ls (Lua)
+- pyright (Python)
+- tsserver (TypeScript/JavaScript)
+- gopls (Go)
+- rust_analyzer (Rust)
+- clangd (C/C++)
+- jsonls (JSON)
+- yamlls (YAML)
+- html (HTML)
+- cssls (CSS)
+- tailwindcss (Tailwind CSS)
 
-- You can explore [MiniMax](configs) manually to find which (parts of) config examples suit you best. Read through the relevant config example (starting at 'init.lua') and use interesting parts in your already existing config.
+## Requirements
 
-### Updating
+- Neovim 0.9+
+- Git
+- Node.js (for some LSP servers)
+- Python (for some LSP servers)
+- tree-sitter CLI (for syntax highlighting)
 
-MiniMax doesn't provide fully automatic updates of an already set up config. The recommended approach is to manually explore [configs](configs) and [change log](CHANGELOG.md) to see the changes.
+## Getting Started
 
-The closest approach to automatic updating is:
+1. Open Neovim
+2. Wait for MiniDeps to install all plugins
+3. Restart Neovim
+4. Start coding!
 
-```bash
-# Pull updates of MiniMax itself
-git -C ./MiniMax pull
+The configuration will automatically set up LSP servers and provide a clean, efficient editing experience inspired by Helix's workflow.
 
-# Run setup script again. Remove `NVIM_APPNAME=nvim-minimax` for full-time config
-NVIM_APPNAME=nvim-minimax nvim -l ./MiniMax/setup.lua
+## Helix-Inspired Features
 
-# There probably be messages about backed up files:
-# 1. Examine 'MiniMax-backup' directory with conflicting files.
-# 2. Recover the ones you need.
-# 3. Delete the backup directory.
-```
+This configuration draws heavily from Helix's design philosophy:
 
-### Similar projects
+- **Modal editing** with intuitive key combinations
+- **Selection-first workflow** with easy text object selection
+- **Clean, minimalist interface** with focused functionality
+- **Efficient navigation** with smart defaults
+- **System clipboard integration** for seamless workflow
 
-- [nvim-lua/kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim)
+## Mini.nvim Integration
 
-- More automated approaches ("Neovim distributions"):
-    - [LazyVim/LazyVim](https://github.com/LazyVim/LazyVim)
-    - [NvChad/NvChad](https://github.com/NvChad/NvChad)
-    - [AstroNvim/AstroNvim](https://github.com/AstroNvim/AstroNvim)
+This configuration is built on top of the excellent mini.nvim library, providing:
+
+- **MiniFiles** - File explorer with Miller columns
+- **MiniPick** - Fuzzy finder for everything
+- **MiniGit** - Git integration
+- **MiniCompletion** - LSP completion
+- **MiniSnippets** - Snippet management
+- **MiniSurround** - Surround text operations
+- **MiniAlign** - Text alignment
+- **MiniComment** - Comment toggling
+- **MiniPairs** - Auto-pairs
+- **MiniStatusline** - Clean statusline
+- **MiniTabline** - Buffer management
+- **MiniStarter** - Start screen
+
+And many more mini modules for a complete editing experience.

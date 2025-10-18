@@ -82,6 +82,13 @@ vim.keymap.set('t', '<ESC>', '<C-\\><C-n>', { noremap = true, silent = true })
 -- LSP Global keymaps are now handled in the LSP on_attach function
 -- This ensures they only work when LSP is active and properly configured
 
+-- LSP Debug commands
+nmap('<Leader>ld', '<Cmd>lua vim.diagnostic.open_float()<CR>', 'Show diagnostic popup')
+nmap('<Leader>lD', '<Cmd>lua print("LSP clients:", vim.inspect(vim.lsp.get_clients()))<CR>', 'Debug LSP clients')
+nmap('<Leader>lI', '<Cmd>lua print("LSP Info:", vim.inspect(vim.lsp.get_clients()[1] and vim.lsp.get_clients()[1].config or "No clients"))<CR>', 'Debug LSP config')
+nmap('<Leader>lT', '<Cmd>lua print("File type:", vim.bo.filetype, "| CWD:", vim.fn.getcwd(), "| Buffer:", vim.api.nvim_buf_get_name(0))<CR>', 'Debug file info')
+nmap('<Leader>lC', '<Cmd>lua print("TypeScript config:", vim.fn.system("find . -name tsconfig.json -type f 2>/dev/null | head -5"))<CR>', 'Find tsconfig files')
+
 -- Many general mappings are created by 'mini.basics'. See 'plugin/30_mini.lua'
 
 -- stylua: ignore start
@@ -301,6 +308,13 @@ nmap_leader('ls', '<Cmd>lua vim.lsp.buf.definition()<CR>',      'Go to definitio
 nmap_leader('lt', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', 'Type definition')
 nmap_leader('lw', '<Cmd>lua vim.lsp.buf.workspace_symbol()<CR>', 'Workspace symbols')
 nmap_leader('lW', '<Cmd>lua vim.lsp.buf.document_symbol()<CR>', 'Document symbols')
+
+-- LSP Debug commands
+nmap_leader('lD', '<Cmd>lua print("LSP clients:", vim.inspect(vim.lsp.get_clients()))<CR>', 'Debug LSP clients')
+nmap_leader('lI', '<Cmd>lua print("LSP Info:", vim.inspect(vim.lsp.get_clients()[1] and vim.lsp.get_clients()[1].config or "No clients"))<CR>', 'Debug LSP config')
+nmap_leader('lT', '<Cmd>lua print("File type:", vim.bo.filetype, "| CWD:", vim.fn.getcwd(), "| Buffer:", vim.api.nvim_buf_get_name(0))<CR>', 'Debug file info')
+nmap_leader('lC', '<Cmd>lua print("TypeScript config:", vim.fn.system("find . -name tsconfig.json -type f 2>/dev/null | head -5"))<CR>', 'Find tsconfig files')
+nmap_leader('lS', '<Cmd>lua local clients = vim.lsp.get_clients(); for _, client in ipairs(clients) do if client.name == "ts_ls" then print("TypeScript LSP settings:", vim.inspect(client.config.settings or {})) break end end<CR>', 'Debug TypeScript settings')
 
 -- Visual mode LSP
 xmap_leader('lf', formatting_cmd, 'Format selection')

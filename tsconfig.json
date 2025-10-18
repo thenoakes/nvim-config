@@ -13,7 +13,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "allowImportingTsExtensions": true,
+    "noEmitOnError": false,
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
   "include": [
     "**/*.ts",
@@ -22,6 +30,11 @@
     "**/*.jsx"
   ],
   "exclude": [
-    "node_modules"
-  ]
+    "node_modules",
+    "dist",
+    "build"
+  ],
+  "ts-node": {
+    "esm": true
+  }
 }

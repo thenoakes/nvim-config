@@ -180,12 +180,48 @@ now_if_args(function()
     vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, bufopts)
   end
 
-  -- Use the modern vim.lsp.enable approach for automatic LSP setup
-  -- This is the cleanest way to enable LSP without deprecation warnings
+  -- Configure TypeScript LSP with proper root directory detection
+  local lspconfig = require('lspconfig')
+  
+  -- Configure ts_ls with proper root directory detection
+  lspconfig.ts_ls.setup({
+    root_dir = function(fname)
+      return lspconfig.util.root_pattern('tsconfig.json', 'package.json', '.git')(fname) or vim.fn.getcwd()
+    end,
+    on_attach = function(client, bufnr)
+      -- Enable completion triggered by <c-x><c-o>
+      vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+      
+      -- Mappings for LSP
+      local bufopts = { noremap = true, silent = true, buffer = bufnr }
+      vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+      vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+      vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+      vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+      vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+      vim.keymap.set('n', '<F2>', vim.lsp.buf.rename, bufopts)
+      vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+      vim.keymap.set('n', '<F4>', vim.lsp.buf.code_action, bufopts)
+      vim.keymap.set('n', '<F12>', vim.lsp.buf.definition, bufopts)
+      
+      -- Diagnostic keymaps
+      vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, bufopts)
+      vim.keymap.set('n', ']d', vim.diagnostic.goto_next, bufopts)
+      vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, bufopts)
+    end,
+    settings = {
+      typescript = {
+        preferences = {
+          includePackageJsonAutoImports = 'on',
+        },
+      },
+    },
+  })
+
+  -- Use the modern vim.lsp.enable approach for other LSP servers
   vim.lsp.enable({
     'lua_ls',      -- Lua
     'pyright',     -- Python
-    'ts_ls',       -- TypeScript/JavaScript
     'gopls',       -- Go
     'rust_analyzer', -- Rust
     'clangd',      -- C/C++
@@ -240,12 +276,17 @@ now_if_args(function()
     end,
   })
 
-  -- Set up LSP keymaps when LSP attaches
+  -- Set up LSP keymaps when LSP attaches (for non-TypeScript servers)
   vim.api.nvim_create_autocmd('LspAttach', {
     group = augroup,
     callback = function(args)
       local client = vim.lsp.get_client_by_id(args.data.client_id)
       local bufnr = args.buf
+      
+      -- Skip if this is the TypeScript LSP (handled separately)
+      if client and client.name == 'ts_ls' then
+        return
+      end
       
       -- Enable completion triggered by <c-x><c-o>
       vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')

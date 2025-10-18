@@ -79,23 +79,8 @@ nmap('<C-p>', ':cprev<CR>', 'Previous quickfix')
 -- Terminal
 vim.keymap.set('t', '<ESC>', '<C-\\><C-n>', { noremap = true, silent = true })
 
--- LSP Global keymaps (work without leader)
--- These are essential LSP functions that should be easily accessible
-vim.keymap.set('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true, desc = 'LSP Hover' })
-vim.keymap.set('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', { noremap = true, silent = true, desc = 'Go to definition' })
-vim.keymap.set('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', { noremap = true, silent = true, desc = 'Go to declaration' })
-vim.keymap.set('n', 'gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', { noremap = true, silent = true, desc = 'Go to implementation' })
-vim.keymap.set('n', 'gt', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', { noremap = true, silent = true, desc = 'Go to type definition' })
-vim.keymap.set('n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>', { noremap = true, silent = true, desc = 'Go to references' })
-vim.keymap.set('n', '<C-k>', '<Cmd>lua vim.lsp.buf.signature_help()<CR>', { noremap = true, silent = true, desc = 'Signature help' })
-vim.keymap.set('n', '<F2>', '<Cmd>lua vim.lsp.buf.rename()<CR>', { noremap = true, silent = true, desc = 'Rename symbol' })
-vim.keymap.set('n', '<F4>', '<Cmd>lua vim.lsp.buf.code_action()<CR>', { noremap = true, silent = true, desc = 'Code actions' })
-vim.keymap.set('n', '<F12>', '<Cmd>lua vim.lsp.buf.definition()<CR>', { noremap = true, silent = true, desc = 'Go to definition' })
-
--- Diagnostic navigation
-vim.keymap.set('n', '[d', '<Cmd>lua vim.diagnostic.goto_prev()<CR>', { noremap = true, silent = true, desc = 'Previous diagnostic' })
-vim.keymap.set('n', ']d', '<Cmd>lua vim.diagnostic.goto_next()<CR>', { noremap = true, silent = true, desc = 'Next diagnostic' })
-vim.keymap.set('n', '<leader>e', '<Cmd>lua vim.diagnostic.open_float()<CR>', { noremap = true, silent = true, desc = 'Show diagnostic' })
+-- LSP Global keymaps are now handled in the LSP on_attach function
+-- This ensures they only work when LSP is active and properly configured
 
 -- Many general mappings are created by 'mini.basics'. See 'plugin/30_mini.lua'
 

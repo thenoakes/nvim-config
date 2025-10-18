@@ -152,9 +152,39 @@ now_if_args(function()
   local lspconfig = require('lspconfig')
   local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
+  -- Add additional capabilities
+  capabilities.textDocument.completion.completionItem.snippetSupport = true
+  capabilities.textDocument.completion.completionItem.resolveSupport = {
+    properties = { 'documentation', 'detail', 'additionalTextEdits' }
+  }
+
+  -- Global LSP on_attach function
+  local on_attach = function(client, bufnr)
+    -- Enable completion triggered by <c-x><c-o>
+    vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+    
+    -- Mappings for LSP
+    local bufopts = { noremap = true, silent = true, buffer = bufnr }
+    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+    vim.keymap.set('n', '<F2>', vim.lsp.buf.rename, bufopts)
+    vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+    vim.keymap.set('n', '<F4>', vim.lsp.buf.code_action, bufopts)
+    vim.keymap.set('n', '<F12>', vim.lsp.buf.definition, bufopts)
+    
+    -- Diagnostic keymaps
+    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, bufopts)
+    vim.keymap.set('n', ']d', vim.diagnostic.goto_next, bufopts)
+    vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, bufopts)
+  end
+
   -- Lua LSP
   lspconfig.lua_ls.setup({
     capabilities = capabilities,
+    on_attach = on_attach,
     settings = {
       Lua = {
         runtime = { version = 'LuaJIT' },
@@ -168,16 +198,23 @@ now_if_args(function()
   -- TypeScript/JavaScript LSP
   lspconfig.tsserver.setup({
     capabilities = capabilities,
+    on_attach = on_attach,
     filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
     settings = {
       typescript = {
         inlayHints = {
           enabled = true,
         },
+        suggest = {
+          completeFunctionCalls = true,
+        },
       },
       javascript = {
         inlayHints = {
           enabled = true,
+        },
+        suggest = {
+          completeFunctionCalls = true,
         },
       },
     },
@@ -186,23 +223,27 @@ now_if_args(function()
   -- HTML LSP
   lspconfig.html.setup({
     capabilities = capabilities,
+    on_attach = on_attach,
     filetypes = { 'html', 'htmldjango', 'htmlmoustache', 'handlebars' },
   })
 
   -- CSS LSP
   lspconfig.cssls.setup({
     capabilities = capabilities,
+    on_attach = on_attach,
   })
 
   -- Tailwind CSS LSP
   lspconfig.tailwindcss.setup({
     capabilities = capabilities,
+    on_attach = on_attach,
     filetypes = { 'html', 'css', 'scss', 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
   })
 
   -- JSON LSP
   lspconfig.jsonls.setup({
     capabilities = capabilities,
+    on_attach = on_attach,
     settings = {
       json = {
         schemas = require('schemastore').json.schemas(),
@@ -213,26 +254,31 @@ now_if_args(function()
   -- Python LSP
   lspconfig.pyright.setup({
     capabilities = capabilities,
+    on_attach = on_attach,
   })
 
   -- Go LSP
   lspconfig.gopls.setup({
     capabilities = capabilities,
+    on_attach = on_attach,
   })
 
   -- Rust LSP
   lspconfig.rust_analyzer.setup({
     capabilities = capabilities,
+    on_attach = on_attach,
   })
 
   -- C/C++ LSP
   lspconfig.clangd.setup({
     capabilities = capabilities,
+    on_attach = on_attach,
   })
 
   -- YAML LSP
   lspconfig.yamlls.setup({
     capabilities = capabilities,
+    on_attach = on_attach,
   })
 
   -- LSP autocommands for better diagnostics and formatting

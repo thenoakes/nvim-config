@@ -181,6 +181,7 @@ now_if_args(function()
   end
 
   -- Use the modern vim.lsp.enable approach for automatic LSP setup
+  -- This is the cleanest way to enable LSP without deprecation warnings
   vim.lsp.enable({
     'lua_ls',      -- Lua
     'pyright',     -- Python
@@ -195,122 +196,13 @@ now_if_args(function()
     'tailwindcss', -- Tailwind CSS
   })
 
-  -- Configure specific LSP servers with custom settings
-  local lspconfig = require('lspconfig')
-
-  -- Lua LSP with custom settings
-  lspconfig.lua_ls.setup({
-    capabilities = capabilities,
-    on_attach = on_attach,
-    settings = {
-      Lua = {
-        runtime = { version = 'LuaJIT' },
-        diagnostics = { globals = { 'vim' } },
-        workspace = { library = vim.api.nvim_get_runtime_file('', true) },
-        telemetry = { enable = false },
-      },
-    },
-  })
-
-  -- TypeScript/JavaScript LSP with enhanced settings
-  lspconfig.ts_ls.setup({
-    capabilities = capabilities,
-    on_attach = on_attach,
-    filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
-    settings = {
-      typescript = {
-        inlayHints = {
-          enabled = true,
-        },
-        suggest = {
-          completeFunctionCalls = true,
-        },
-        preferences = {
-          includePackageJsonAutoImports = 'on',
-        },
-      },
-      javascript = {
-        inlayHints = {
-          enabled = true,
-        },
-        suggest = {
-          completeFunctionCalls = true,
-        },
-        preferences = {
-          includePackageJsonAutoImports = 'on',
-        },
-      },
-    },
-  })
-
-  -- HTML LSP
-  lspconfig.html.setup({
-    capabilities = capabilities,
-    on_attach = on_attach,
-    filetypes = { 'html', 'htmldjango', 'htmlmoustache', 'handlebars' },
-  })
-
-  -- CSS LSP
-  lspconfig.cssls.setup({
-    capabilities = capabilities,
-    on_attach = on_attach,
-  })
-
-  -- Tailwind CSS LSP
-  lspconfig.tailwindcss.setup({
-    capabilities = capabilities,
-    on_attach = on_attach,
-    filetypes = { 'html', 'css', 'scss', 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
-  })
-
-  -- JSON LSP
-  lspconfig.jsonls.setup({
-    capabilities = capabilities,
-    on_attach = on_attach,
-    settings = {
-      json = {
-        schemas = require('schemastore').json.schemas(),
-      },
-    },
-  })
-
-  -- Python LSP
-  lspconfig.pyright.setup({
-    capabilities = capabilities,
-    on_attach = on_attach,
-  })
-
-  -- Go LSP
-  lspconfig.gopls.setup({
-    capabilities = capabilities,
-    on_attach = on_attach,
-  })
-
-  -- Rust LSP
-  lspconfig.rust_analyzer.setup({
-    capabilities = capabilities,
-    on_attach = on_attach,
-  })
-
-  -- C/C++ LSP
-  lspconfig.clangd.setup({
-    capabilities = capabilities,
-    on_attach = on_attach,
-  })
-
-  -- YAML LSP
-  lspconfig.yamlls.setup({
-    capabilities = capabilities,
-    on_attach = on_attach,
-  })
-
   -- LSP autocommands for better diagnostics and formatting
   local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
   local lsp_formatting = function(bufnr)
     vim.lsp.buf.format({
       bufnr = bufnr,
       filter = function(client)
-        return client.name ~= 'tsserver' -- Use prettier for JS/TS
+        return client.name ~= 'ts_ls' -- Use prettier for JS/TS
       end,
     })
   end
@@ -345,6 +237,35 @@ now_if_args(function()
     pattern = '*',
     callback = function()
       vim.lsp.buf.clear_references()
+    end,
+  })
+
+  -- Set up LSP keymaps when LSP attaches
+  vim.api.nvim_create_autocmd('LspAttach', {
+    group = augroup,
+    callback = function(args)
+      local client = vim.lsp.get_client_by_id(args.data.client_id)
+      local bufnr = args.buf
+      
+      -- Enable completion triggered by <c-x><c-o>
+      vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+      
+      -- Mappings for LSP
+      local bufopts = { noremap = true, silent = true, buffer = bufnr }
+      vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+      vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+      vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+      vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+      vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+      vim.keymap.set('n', '<F2>', vim.lsp.buf.rename, bufopts)
+      vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+      vim.keymap.set('n', '<F4>', vim.lsp.buf.code_action, bufopts)
+      vim.keymap.set('n', '<F12>', vim.lsp.buf.definition, bufopts)
+      
+      -- Diagnostic keymaps
+      vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, bufopts)
+      vim.keymap.set('n', ']d', vim.diagnostic.goto_next, bufopts)
+      vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, bufopts)
     end,
   })
 

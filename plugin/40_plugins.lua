@@ -107,28 +107,263 @@ end)
 --
 -- Here Neovim itself is a client (see `:h vim.lsp`). Language servers need to
 -- be installed separately based on your OS, CLI tools, and preferences.
--- See note about 'mason.nvim' at the bottom of the file.
---
--- Neovim's team collects commonly used configurations for most language servers
--- inside 'neovim/nvim-lspconfig' plugin.
+-- We use Mason to manage LSP servers, formatters, and linters.
 --
 -- Add it now if file (and not 'mini.starter') is shown after startup.
 now_if_args(function()
+  -- Install Mason for LSP server management
+  add('mason-org/mason.nvim')
+  add('mason-org/mason-lspconfig.nvim')
   add('neovim/nvim-lspconfig')
+  add('hrsh7th/cmp-nvim-lsp')
+  add('b0o/schemastore.nvim')
 
-  -- Enable common language servers using the modern vim.lsp.config API
-  vim.lsp.enable({
-    'lua_ls',      -- Lua
-    'pyright',     -- Python
-    'tsserver',    -- TypeScript/JavaScript
-    'gopls',       -- Go
-    'rust_analyzer', -- Rust
-    'clangd',      -- C/C++
-    'jsonls',      -- JSON
-    'yamlls',      -- YAML
-    'html',        -- HTML
-    'cssls',       -- CSS
-    'tailwindcss', -- Tailwind CSS
+  -- Configure Mason
+  require('mason').setup({
+    ui = {
+      border = 'rounded',
+      icons = {
+        package_installed = '✓',
+        package_pending = '➜',
+        package_uninstalled = '✗'
+      }
+    }
+  })
+
+  -- Configure mason-lspconfig
+  require('mason-lspconfig').setup({
+    ensure_installed = {
+      'lua_ls',      -- Lua
+      'pyright',     -- Python
+      'tsserver',    -- TypeScript/JavaScript
+      'gopls',       -- Go
+      'rust_analyzer', -- Rust
+      'clangd',      -- C/C++
+      'jsonls',      -- JSON
+      'yamlls',      -- YAML
+      'html',        -- HTML
+      'cssls',       -- CSS
+      'tailwindcss', -- Tailwind CSS
+    },
+    automatic_installation = true,
+  })
+
+  -- Configure LSP servers
+  local lspconfig = require('lspconfig')
+  local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+  -- Lua LSP
+  lspconfig.lua_ls.setup({
+    capabilities = capabilities,
+    settings = {
+      Lua = {
+        runtime = { version = 'LuaJIT' },
+        diagnostics = { globals = { 'vim' } },
+        workspace = { library = vim.api.nvim_get_runtime_file('', true) },
+        telemetry = { enable = false },
+      },
+    },
+  })
+
+  -- TypeScript/JavaScript LSP
+  lspconfig.tsserver.setup({
+    capabilities = capabilities,
+    filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+    settings = {
+      typescript = {
+        inlayHints = {
+          enabled = true,
+        },
+      },
+      javascript = {
+        inlayHints = {
+          enabled = true,
+        },
+      },
+    },
+  })
+
+  -- HTML LSP
+  lspconfig.html.setup({
+    capabilities = capabilities,
+    filetypes = { 'html', 'htmldjango', 'htmlmoustache', 'handlebars' },
+  })
+
+  -- CSS LSP
+  lspconfig.cssls.setup({
+    capabilities = capabilities,
+  })
+
+  -- Tailwind CSS LSP
+  lspconfig.tailwindcss.setup({
+    capabilities = capabilities,
+    filetypes = { 'html', 'css', 'scss', 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+  })
+
+  -- JSON LSP
+  lspconfig.jsonls.setup({
+    capabilities = capabilities,
+    settings = {
+      json = {
+        schemas = require('schemastore').json.schemas(),
+      },
+    },
+  })
+
+  -- Python LSP
+  lspconfig.pyright.setup({
+    capabilities = capabilities,
+  })
+
+  -- Go LSP
+  lspconfig.gopls.setup({
+    capabilities = capabilities,
+  })
+
+  -- Rust LSP
+  lspconfig.rust_analyzer.setup({
+    capabilities = capabilities,
+  })
+
+  -- C/C++ LSP
+  lspconfig.clangd.setup({
+    capabilities = capabilities,
+  })
+
+  -- YAML LSP
+  lspconfig.yamlls.setup({
+    capabilities = capabilities,
+  })
+
+  -- LSP autocommands for better diagnostics and formatting
+  local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
+  local lsp_formatting = function(bufnr)
+    vim.lsp.buf.format({
+      bufnr = bufnr,
+      filter = function(client)
+        return client.name ~= 'tsserver' -- Use prettier for JS/TS
+      end,
+    })
+  end
+
+  -- Auto-format on save for supported filetypes
+  vim.api.nvim_create_autocmd('BufWritePre', {
+    group = augroup,
+    pattern = { '*.lua', '*.py', '*.go', '*.rs', '*.cpp', '*.c', '*.h', '*.hpp' },
+    callback = function()
+      lsp_formatting(vim.api.nvim_get_current_buf())
+    end,
+  })
+
+  -- Show diagnostics on cursor hold
+  vim.api.nvim_create_autocmd('CursorHold', {
+    pattern = '*',
+    callback = function()
+      vim.diagnostic.open_float(nil, { focus = false })
+    end,
+  })
+
+  -- Highlight references on cursor hold
+  vim.api.nvim_create_autocmd('CursorHold', {
+    pattern = '*',
+    callback = function()
+      vim.lsp.buf.document_highlight()
+    end,
+  })
+
+  -- Clear references when cursor moves
+  vim.api.nvim_create_autocmd('CursorMoved', {
+    pattern = '*',
+    callback = function()
+      vim.lsp.buf.clear_references()
+    end,
+  })
+end)
+
+-- Completion =================================================================
+
+-- Auto-completion is a crucial feature for modern code editing. It provides
+-- intelligent suggestions as you type, making coding faster and more accurate.
+--
+-- nvim-cmp is the most popular completion engine for Neovim, providing a
+-- unified interface for various completion sources including LSP, snippets,
+-- and more.
+now_if_args(function()
+  add('hrsh7th/nvim-cmp')
+  add('hrsh7th/cmp-buffer')
+  add('hrsh7th/cmp-path')
+  add('hrsh7th/cmp-cmdline')
+  add('saadparwaiz1/cmp_luasnip')
+  add('L3MON4D3/LuaSnip')
+
+  local cmp = require('cmp')
+  local luasnip = require('luasnip')
+
+  cmp.setup({
+    snippet = {
+      expand = function(args)
+        luasnip.lsp_expand(args.body)
+      end,
+    },
+    mapping = cmp.mapping.preset.insert({
+      ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-f>'] = cmp.mapping.scroll_docs(4),
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<C-e>'] = cmp.mapping.abort(),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }),
+      ['<Tab>'] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_next_item()
+        elseif luasnip.expand_or_jumpable() then
+          luasnip.expand_or_jump()
+        else
+          fallback()
+        end
+      end, { 'i', 's' }),
+      ['<S-Tab>'] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
+        elseif luasnip.jumpable(-1) then
+          luasnip.jump(-1)
+        else
+          fallback()
+        end
+      end, { 'i', 's' }),
+    }),
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'luasnip' },
+    }, {
+      { name = 'buffer' },
+      { name = 'path' },
+    }),
+  })
+
+  -- Set configuration for specific filetypes
+  cmp.setup.filetype('gitcommit', {
+    sources = cmp.config.sources({
+      { name = 'git' },
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore)
+  cmp.setup.cmdline({ '/', '?' }, {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+      { name = 'buffer' }
+    }
+  })
+
+  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore)
+  cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = 'path' }
+    }, {
+      { name = 'cmdline' }
+    })
   })
 end)
 
@@ -143,14 +378,30 @@ end)
 later(function()
   add('stevearc/conform.nvim')
 
-  -- See also:
-  -- - `:h Conform`
-  -- - `:h conform-options`
-  -- - `:h conform-formatters`
+  -- Configure formatters
   require('conform').setup({
-    -- Map of filetype to formatters
-    -- Make sure that necessary CLI tool is available
-    -- formatters_by_ft = { lua = { 'stylua' } },
+    formatters_by_ft = {
+      lua = { 'stylua' },
+      javascript = { 'prettier' },
+      javascriptreact = { 'prettier' },
+      typescript = { 'prettier' },
+      typescriptreact = { 'prettier' },
+      json = { 'prettier' },
+      yaml = { 'prettier' },
+      markdown = { 'prettier' },
+      html = { 'prettier' },
+      css = { 'prettier' },
+      scss = { 'prettier' },
+      python = { 'black', 'isort' },
+      go = { 'gofmt', 'goimports' },
+      rust = { 'rustfmt' },
+      c = { 'clang-format' },
+      cpp = { 'clang-format' },
+    },
+    format_on_save = {
+      timeout_ms = 500,
+      lsp_fallback = true,
+    },
   })
 end)
 

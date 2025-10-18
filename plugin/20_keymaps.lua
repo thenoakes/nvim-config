@@ -79,6 +79,24 @@ nmap('<C-p>', ':cprev<CR>', 'Previous quickfix')
 -- Terminal
 vim.keymap.set('t', '<ESC>', '<C-\\><C-n>', { noremap = true, silent = true })
 
+-- LSP Global keymaps (work without leader)
+-- These are essential LSP functions that should be easily accessible
+vim.keymap.set('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true, desc = 'LSP Hover' })
+vim.keymap.set('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', { noremap = true, silent = true, desc = 'Go to definition' })
+vim.keymap.set('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', { noremap = true, silent = true, desc = 'Go to declaration' })
+vim.keymap.set('n', 'gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', { noremap = true, silent = true, desc = 'Go to implementation' })
+vim.keymap.set('n', 'gt', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', { noremap = true, silent = true, desc = 'Go to type definition' })
+vim.keymap.set('n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>', { noremap = true, silent = true, desc = 'Go to references' })
+vim.keymap.set('n', '<C-k>', '<Cmd>lua vim.lsp.buf.signature_help()<CR>', { noremap = true, silent = true, desc = 'Signature help' })
+vim.keymap.set('n', '<F2>', '<Cmd>lua vim.lsp.buf.rename()<CR>', { noremap = true, silent = true, desc = 'Rename symbol' })
+vim.keymap.set('n', '<F4>', '<Cmd>lua vim.lsp.buf.code_action()<CR>', { noremap = true, silent = true, desc = 'Code actions' })
+vim.keymap.set('n', '<F12>', '<Cmd>lua vim.lsp.buf.definition()<CR>', { noremap = true, silent = true, desc = 'Go to definition' })
+
+-- Diagnostic navigation
+vim.keymap.set('n', '[d', '<Cmd>lua vim.diagnostic.goto_prev()<CR>', { noremap = true, silent = true, desc = 'Previous diagnostic' })
+vim.keymap.set('n', ']d', '<Cmd>lua vim.diagnostic.goto_next()<CR>', { noremap = true, silent = true, desc = 'Next diagnostic' })
+vim.keymap.set('n', '<leader>e', '<Cmd>lua vim.diagnostic.open_float()<CR>', { noremap = true, silent = true, desc = 'Show diagnostic' })
+
 -- Many general mappings are created by 'mini.basics'. See 'plugin/30_mini.lua'
 
 -- stylua: ignore start
@@ -274,8 +292,9 @@ xmap_leader('ep', '"+p',                                    'Paste from system c
 -- NOTE: most LSP mappings represent a more structured way of replacing built-in
 -- LSP mappings (like `:h gra` and others). This is needed because `gr` is mapped
 -- by an "replace" operator in 'mini.operators' (which is more commonly used).
-local formatting_cmd = '<Cmd>lua require("conform").format({lsp_fallback=true})<CR>'
+local formatting_cmd = '<Cmd>lua vim.lsp.buf.format({async=true})<CR>'
 
+-- LSP Actions
 nmap_leader('la', '<Cmd>lua vim.lsp.buf.code_action()<CR>',     'Actions')
 nmap_leader('ld', '<Cmd>lua vim.diagnostic.open_float()<CR>',   'Diagnostic popup')
 nmap_leader('lf', formatting_cmd,                               'Format')
@@ -286,7 +305,21 @@ nmap_leader('lR', '<Cmd>lua vim.lsp.buf.references()<CR>',      'References')
 nmap_leader('ls', '<Cmd>lua vim.lsp.buf.definition()<CR>',      'Source definition')
 nmap_leader('lt', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', 'Type definition')
 
+-- Diagnostic navigation
+nmap_leader('l[', '<Cmd>lua vim.diagnostic.goto_prev()<CR>',    'Previous diagnostic')
+nmap_leader('l]', '<Cmd>lua vim.diagnostic.goto_next()<CR>',    'Next diagnostic')
+nmap_leader('lq', '<Cmd>lua vim.diagnostic.setqflist()<CR>',    'Diagnostics to quickfix')
+
+-- LSP Info
+nmap_leader('li', '<Cmd>lua vim.lsp.buf.implementation()<CR>',  'Implementation')
+nmap_leader('ls', '<Cmd>lua vim.lsp.buf.definition()<CR>',      'Go to definition')
+nmap_leader('lt', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', 'Type definition')
+nmap_leader('lw', '<Cmd>lua vim.lsp.buf.workspace_symbol()<CR>', 'Workspace symbols')
+nmap_leader('lW', '<Cmd>lua vim.lsp.buf.document_symbol()<CR>', 'Document symbols')
+
+-- Visual mode LSP
 xmap_leader('lf', formatting_cmd, 'Format selection')
+xmap_leader('la', '<Cmd>lua vim.lsp.buf.code_action()<CR>', 'Actions on selection')
 
 -- m is for 'Map'. Common usage:
 -- - `<Leader>mt` - toggle map from 'mini.map' (closed by default)

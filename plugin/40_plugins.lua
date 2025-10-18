@@ -135,7 +135,7 @@ now_if_args(function()
     ensure_installed = {
       'lua_ls',      -- Lua
       'pyright',     -- Python
-      'tsserver',    -- TypeScript/JavaScript
+      'ts_ls',       -- TypeScript/JavaScript
       'gopls',       -- Go
       'rust_analyzer', -- Rust
       'clangd',      -- C/C++
@@ -196,31 +196,6 @@ now_if_args(function()
   })
 
   -- TypeScript/JavaScript LSP
-  lspconfig.tsserver.setup({
-    capabilities = capabilities,
-    on_attach = on_attach,
-    filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
-    settings = {
-      typescript = {
-        inlayHints = {
-          enabled = true,
-        },
-        suggest = {
-          completeFunctionCalls = true,
-        },
-      },
-      javascript = {
-        inlayHints = {
-          enabled = true,
-        },
-        suggest = {
-          completeFunctionCalls = true,
-        },
-      },
-    },
-  })
-
-  -- Also try with the correct server name that Mason installs
   lspconfig.ts_ls.setup({
     capabilities = capabilities,
     on_attach = on_attach,

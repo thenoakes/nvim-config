@@ -189,7 +189,7 @@ MiniDeps.now(function()
   
   -- Configure and enable Catppuccin
   require('catppuccin').setup({
-    flavour = "mocha", -- latte, frappe, macchiato, mocha
+    flavour = "frappe", -- latte, frappe, macchiato, mocha
     background = {
       light = "latte",
       dark = "mocha",
